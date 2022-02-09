@@ -87,13 +87,15 @@ class AnswersBase(BaseDB):
     # 定义表结构
     id = Column(Integer, primary_key=True, autoincrement=True)
     respondentId = Column(Integer, ForeignKey("respondents.id"), nullable=False, index=True)
+    questionnaireId = Column(Integer, ForeignKey("questionnaires.id"), nullable=False, index=True)
     questionId = Column(Integer, ForeignKey("questions.id"), nullable=False, index=True)
     reference = Column(Boolean, nullable=False)
     referenceAnswer = Column(String(1000), nullable=False)
-    answer = Column(String(1000), nullable=False)
+    answer = Column(String(20), nullable=False)
 
-    def __init__(self, respondent_id, question_id, reference, reference_answer, answer):
+    def __init__(self, respondent_id, questionnaire_id, question_id, reference, reference_answer, answer):
         self.respondentId = respondent_id
+        self.questionnaireId = questionnaire_id
         self.questionId = question_id
         self.reference = reference
         self.referenceAnswer = reference_answer

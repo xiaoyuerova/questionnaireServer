@@ -14,6 +14,31 @@ from conf.base import Session
 from sqlalchemy.orm import scoped_session
 
 
+def query_respondents(value, key='id', search_all=False):
+    """
+    :param value: 要搜索的值
+    :param key: 要搜索的属性
+    :param search_all: True表示搜索全部匹配值，False表示只获取第一个匹配值
+    :return:
+    """
+    session = scoped_session(Session)
+    try:
+        if search_all:
+            if key == 'id':
+                ex_rs = session.query(Respondents).filter(Respondents.id == value).all()
+                return ex_rs
+            return
+        if key == 'id':
+            ex_r = session.query(Respondents).filter(Respondents.id == value).first()
+            return ex_r
+        return
+    except Exception as e:
+        session.rollback()
+        print(f"ERROR： {e}")
+    finally:
+        session.close()
+
+
 class Respondents(RespondentsBase):
     def __init__(self, **kwargs):
         questionnaire_id = kwargs['questionnaireId']
