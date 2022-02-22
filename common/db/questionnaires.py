@@ -7,7 +7,7 @@ from conf.base import (
 
 from conf.base import Session
 from sqlalchemy.orm import scoped_session
-
+# 防止循环调用说明：排序questioners、questionnaires、questions、respondents、answers。这5个模块间的调用只允许排序在前的调用后面的。
 from common.db.questioners import query_questioners
 
 
@@ -27,6 +27,9 @@ def query_questionnaires(value, key='name', search_all=False):
             if key == 'id':
                 ex_qs = session.query(Questionnaires).filter(Questionnaires.id == value).all()
                 return ex_qs
+            if key == 'questionerId':
+                ex_qs = session.query(Questionnaires).filter(Questionnaires.questionerId == value).all()
+                return ex_qs
             return
         if key == 'name':
             ex_q = session.query(Questionnaires).filter(Questionnaires.name == value).first()
@@ -34,6 +37,10 @@ def query_questionnaires(value, key='name', search_all=False):
         if key == 'id':
             ex_q = session.query(Questionnaires).filter(Questionnaires.id == value).first()
             return ex_q
+        if key == 'questionerId':
+            ex_q = session.query(Questionnaires).filter(Questionnaires.questionerId == value)
+            return ex_q
+        print(ERROR_CODE['1'])
         return
     except Exception as e:
         session.rollback()
@@ -86,3 +93,58 @@ class Questionnaires(QuestionnairesBase):
             print(f"ERROR： {e}")
         finally:
             session.close()
+
+    def modify(self, value, key='name'):
+        if not value:
+            return '2010'
+        session = scoped_session(Session)
+        try:
+            if key == 'name':
+                session.query(Questionnaires).filter(Questionnaires.id == self.id).update({Questionnaires.name: value})
+            if key == 'published':
+                session.query(Questionnaires).filter(Questionnaires.id == self.id).update(
+                    {Questionnaires.published: value})
+            if key == 'respondentsCount':
+                session.query(Questionnaires).filter(Questionnaires.id == self.id).update(
+                    {Questionnaires.respondentsCount: value})
+            session.commit()
+            print('modify successful')
+            return '0'
+        except Exception as e:
+            session.rollback()
+            print(f"ERROR： {e}")
+        finally:
+            session.close()
+
+    # def check(self):
+    #     ex_questionnaire = query_questionnaires(self.id, key='id')
+    #     if not ex_questionnaire:
+    #         return '2020'
+    #     # 删除本问卷包含的问题信息（questions）
+    #     ex_qs = query_questions(self.id, search_all=True)
+    #     if ex_qs:
+    #         for ex_q in ex_qs:
+    #             ex_q.delete()
+    #     # 删除本问卷包含的答案，答题人信息（answers，respondents）,删除respondents时会同时删除依赖的answers
+    #     ex_rs = query_respondents(self.id, key='questionnaireId', search_all=True)
+    #     if ex_rs:
+    #         for ex_r in ex_rs:
+    #             ex_r.delete()
+    #     return '0'
+    #
+    # def delete(self):
+    #     code = self.check()
+    #     if code != '0':
+    #         print(ERROR_CODE[code])
+    #         return code
+    #     session = scoped_session(Session)
+    #     try:
+    #         session.delete(self)
+    #         session.commit()
+    #         print('delete successful')
+    #         return '0'
+    #     except Exception as e:
+    #         session.rollback()
+    #         print(f"ERROR： {e}")
+    #     finally:
+    #         session.close()

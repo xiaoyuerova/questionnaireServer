@@ -23,6 +23,7 @@ class Application(tornado.web.Application):
             (r"/questionnaires/", include('views.questionnaires.questionnaires_urls')),
             (r"/questions/", include('views.questions.questions_urls')),
             (r"/respondents/", include('views.respondents.respondents_urls')),
+            (r"/answers/", include('views.answers.answers_urls')),
         ])
         settings = dict(
             debug=True,

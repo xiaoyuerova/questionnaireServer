@@ -6,7 +6,6 @@ from conf.base import (
 from conf.base import Session
 from sqlalchemy.orm import scoped_session
 
-from common.db.respondents import query_respondents
 from common.db.questions import query_questions
 
 
@@ -39,6 +38,7 @@ def query_answers(value, key='questionnaireId', search_all=False):
         if key == 'respondentId':
             ex_a = session.query(Answers).filter(Answers.respondentId == value).first()
             return ex_a
+        print(ERROR_CODE['1'])
         return
     except Exception as e:
         session.rollback()
@@ -61,10 +61,12 @@ class Answers(AnswersBase):
             questionnaire_id = int(questionnaire_id)
         if type(question_id) == str:
             question_id = int(question_id)
-        if type(reference) == str and reference == 'true':
-            reference = True
-        if type(reference) == str and reference == 'false':
-            reference = False
+        # if type(reference) == str and reference == 'true':
+        #     reference = True
+        # if type(reference) == str and reference == 'false':
+        #     reference = False
+        if not type(answer) == str:
+            answer = str(answer)
         super(Answers, self).__init__(respondent_id, questionnaire_id, question_id, reference, reference_answer, answer)
 
     def verify(self):
@@ -94,3 +96,42 @@ class Answers(AnswersBase):
             print(f"ERROR： {e}")
         finally:
             session.close()
+
+    def modify(self, value, key='answer'):
+        if not value:
+            return '5006'
+        session = scoped_session(Session)
+        try:
+            if key == 'answer':
+                session.query(Answers).filter(Answers.id == self.id).update({Answers.answer: value})
+            session.commit()
+            print('modify successful')
+            return '0'
+        except Exception as e:
+            session.rollback()
+            print(f"ERROR： {e}")
+        finally:
+            session.close()
+
+    # def check(self):
+    #     ex_a = query_answers(self.id, key='id')
+    #     if not ex_a:
+    #         return '5020'
+    #     return '0'
+    #
+    # def delete(self):
+    #     code = self.check()
+    #     if code != '0':
+    #         print(ERROR_CODE[code])
+    #         return code
+    #     session = scoped_session(Session)
+    #     try:
+    #         session.delete(self)
+    #         session.commit()
+    #         print('delete successful')
+    #         return '0'
+    #     except Exception as e:
+    #         session.rollback()
+    #         print(f"ERROR： {e}")
+    #     finally:
+    #         session.close()

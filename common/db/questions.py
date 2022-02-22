@@ -38,6 +38,7 @@ def query_questions(value, key='questionnaireId', search_all=False):
         if key == 'id':
             ex_q = session.query(Questions).filter(Questions.id == value).first()
             return ex_q
+        print(ERROR_CODE['1'])
         return
     except Exception as e:
         session.rollback()
@@ -52,17 +53,20 @@ class Questions(QuestionsBase):
         :param kwargs:
         """
         questionnaire_id = kwargs['questionnaireId']
+        question_number = kwargs['questionNumber']
         _type = kwargs['type']
         question = kwargs['question']
         options = kwargs['options']
-        options_count = kwargs['options_count']
+        options_count = kwargs['optionsCount']
         if type(questionnaire_id) == str:
             questionnaire_id = int(questionnaire_id)
+        if type(question_number) == str:
+            question_number = int(question_number)
         if type(_type) == str:
             _type = int(_type)
         if type(options_count) == str:
             options_count = int(options_count)
-        super(Questions, self).__init__(questionnaire_id, _type, question, options, options_count)
+        super(Questions, self).__init__(questionnaire_id, question_number, _type, question, options, options_count)
 
     def verify(self):
         """
@@ -85,6 +89,11 @@ class Questions(QuestionsBase):
         options_p = option_parsing(self.options)
         if len(options_p) != self.optionsCount:
             return '3008'
+        if questionnaire:
+            questions = query_questions(self.questionnaireId, key='questionnaireId', search_all=True)
+            for question in questions:
+                if question.questionNumber == self.questionNumber:
+                    return '3009'
         return '0'
 
     def add(self):
@@ -101,6 +110,24 @@ class Questions(QuestionsBase):
             session.add(self)
             session.commit()
             print('add successful')
+            return '0'
+        except Exception as e:
+            session.rollback()
+            print(f"ERROR： {e}")
+        finally:
+            session.close()
+
+    def modify(self, value, key='referenceAnswer'):
+        if not value:
+            return '3010'
+        session = scoped_session(Session)
+        try:
+            if key == 'referenceAnswer':
+                session.query(Questions).filter(Questions.id == self.id).update({Questions.referenceAnswer: value})
+            if key == 'reference':
+                session.query(Questions).filter(Questions.id == self.id).update({Questions.reference: value})
+            session.commit()
+            print('modify successful')
             return '0'
         except Exception as e:
             session.rollback()

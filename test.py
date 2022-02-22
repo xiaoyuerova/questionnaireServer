@@ -24,10 +24,18 @@ class B(A):
             print(self.aA)
 
 
+def add(nums):
+    if len(nums) > 2:
+        return 0, sum(nums)
+    else:
+        return 1
+
+
 def main():
-    a = 1
-    obj = B(a)
-    print('ok', obj.__getattribute__('aA'))
+    a = [1, 2, 3]
+    x = add(a)
+    if not x == 1:
+        print(x)
 
 
 if __name__ == "__main__":

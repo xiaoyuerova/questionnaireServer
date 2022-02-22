@@ -13,13 +13,14 @@ class CreateHandler(BaseHandler):
         try:
             # 获取⼊参
             questionnaire_id = self.get_argument('questionnaireId')
+            question_number = self.get_argument('questionNumber')
             _type = self.get_argument('type')
             question = self.get_argument('question')
             options = self.get_argument('options')
             options_count = self.get_argument('options_count')
 
-            question = Questions(questionnaireId=questionnaire_id, type=_type, question=question, options=options,
-                                 options_count=options_count)
+            question = Questions(questionnaireId=questionnaire_id, questionNumber=question_number, type=_type,
+                                 question=question, options=options, optionsCount=options_count)
             code = question.add()
             http_response(self, ERROR_CODE[code], code)
 
@@ -27,7 +28,6 @@ class CreateHandler(BaseHandler):
             # 获取⼊参失败时，抛出错误码及错误信息
             http_response(self, ERROR_CODE['3001'], '3001')
             print(f"ERROR： {e}")
-
 
 # class GetHandler(BaseHandler):
 #     def get(self):

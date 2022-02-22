@@ -27,6 +27,9 @@ def query_questioners(value, key='userName', search_all=False):
             if key == 'id':
                 ex_qs = session.query(Questioners).filter(Questioners.id == value).all()
                 return ex_qs
+            if key == 'email':
+                ex_qs = session.query(Questioners).filter(Questioners.email == value).all()
+                return ex_qs
             return
         if key == 'userName':
             ex_q = session.query(Questioners).filter(Questioners.userName == value).first()
@@ -34,6 +37,10 @@ def query_questioners(value, key='userName', search_all=False):
         if key == 'id':
             ex_q = session.query(Questioners).filter(Questioners.id == value).first()
             return ex_q
+        if key == 'email':
+            ex_q = session.query(Questioners).filter(Questioners.email == value).first()
+            return ex_q
+        print(ERROR_CODE['1'])
         return
     except Exception as e:
         session.rollback()
@@ -45,8 +52,9 @@ def query_questioners(value, key='userName', search_all=False):
 class Questioners(QuestionersBase):
     def __init__(self, **kwargs):
         user_name = kwargs['user_name']
+        email = kwargs['email']
         password = kwargs['password']
-        super(Questioners, self).__init__(user_name, password)
+        super(Questioners, self).__init__(user_name, email, password)
 
     def verify(self):
         if len(self.userName) < USER_NAME_LEN_MIN:
@@ -80,3 +88,31 @@ class Questioners(QuestionersBase):
             print(f"ERROR： {e}")
         finally:
             session.close()
+
+    # def check(self):
+    #     ex_questioner = query_questioners(self.id, key='id')
+    #     if not ex_questioner:
+    #         return '1020'
+    #     # 删除依赖该用户的问卷
+    #     ex_qs = query_questionnaires(self.id, key='questionerId', search_all=True)
+    #     if ex_qs:
+    #         for ex_q in ex_qs:
+    #             ex_q.delete()
+    #     return '0'
+    #
+    # def delete(self):
+    #     # code = self.check()
+    #     # if code != '0':
+    #     #     print(ERROR_CODE[code])
+    #     #     return code
+    #     session = scoped_session(Session)
+    #     try:
+    #         session.delete(self)
+    #         session.commit()
+    #         print('delete successful')
+    #         return '0'
+    #     except Exception as e:
+    #         session.rollback()
+    #         print(f"ERROR： {e}")
+    #     finally:
+    #         session.close()
