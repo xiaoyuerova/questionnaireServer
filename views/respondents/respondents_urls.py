@@ -1,8 +1,12 @@
 from __future__ import unicode_literals
 from views.respondents.respondents_views import (
-    RegisterHandler
+    RegisterHandler,
+    DeleteHandler,
+    CompleteHandler
 )
 
 urls = [
-    ('register', RegisterHandler)
+    (r'register', RegisterHandler),
+    (r'delete', DeleteHandler),
+    (r'complete', CompleteHandler)
 ]

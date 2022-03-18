@@ -27,9 +27,15 @@ def query_respondents(value, key='id', search_all=False):
             if key == 'id':
                 ex_rs = session.query(Respondents).filter(Respondents.id == value).all()
                 return ex_rs
+            if key == 'questionnaireId':
+                ex_rs = session.query(Respondents).filter(Respondents.questionnaireId == value).all()
+                return ex_rs
             return
         if key == 'id':
             ex_r = session.query(Respondents).filter(Respondents.id == value).first()
+            return ex_r
+        if key == 'questionnaireId':
+            ex_r = session.query(Respondents).filter(Respondents.questionnaireId == value).first()
             return ex_r
         print(ERROR_CODE['1'])
         return
@@ -78,29 +84,18 @@ class Respondents(RespondentsBase):
         finally:
             session.close()
 
-    # def check(self):
-    #     ex_r = query_respondents(self.id, key='id')
-    #     if not ex_r:
-    #         return '4020'
-    #     ex_as = query_answers(self.id, key='respondentId', search_all=True)
-    #     if ex_as:
-    #         for ex_a in ex_as:
-    #             ex_a.delete()
-    #     return '0'
-    #
-    # def delete(self):
-    #     code = self.check()
-    #     if code != '0':
-    #         print(ERROR_CODE[code])
-    #         return code
-    #     session = scoped_session(Session)
-    #     try:
-    #         session.delete(self)
-    #         session.commit()
-    #         print('delete successful')
-    #         return '0'
-    #     except Exception as e:
-    #         session.rollback()
-    #         print(f"ERROR： {e}")
-    #     finally:
-    #         session.close()
+    def modify(self, value, key='complete'):
+        if not value:
+            return '4010'
+        session = scoped_session(Session)
+        try:
+            if key == 'complete':
+                session.query(Respondents).filter(Respondents.id == self.id).update({Respondents.complete: value})
+            session.commit()
+            print('modify successful')
+            return '0'
+        except Exception as e:
+            session.rollback()
+            print(f"ERROR： {e}")
+        finally:
+            session.close()

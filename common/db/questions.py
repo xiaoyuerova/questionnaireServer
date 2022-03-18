@@ -64,6 +64,8 @@ class Questions(QuestionsBase):
             question_number = int(question_number)
         if type(_type) == str:
             _type = int(_type)
+        if type(options) == list:
+            options = str(options)
         if type(options_count) == str:
             options_count = int(options_count)
         super(Questions, self).__init__(questionnaire_id, question_number, _type, question, options, options_count)
@@ -86,8 +88,8 @@ class Questions(QuestionsBase):
             return '3006'
         if len(self.options) > OPTIONS_LEN_MAX:
             return '3007'
-        options_p = option_parsing(self.options)
-        if len(options_p) != self.optionsCount:
+        options_list = eval(self.options)
+        if len(options_list) != self.optionsCount:
             return '3008'
         if questionnaire:
             questions = query_questions(self.questionnaireId, key='questionnaireId', search_all=True)

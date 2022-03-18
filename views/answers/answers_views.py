@@ -11,6 +11,7 @@ from common.db.respondents import query_respondents
 from common.db.questionnaires import query_questionnaires
 from common.db.answers import query_answers
 from common.db.questions import query_questions
+from common.db.delete import delete_answers
 
 
 class SubmitHandler(BaseHandler):
@@ -91,4 +92,27 @@ class SubmitHandler(BaseHandler):
         except Exception as e:
             # 获取⼊参失败时，抛出错误码及错误信息
             http_response(self, ERROR_CODE['5001'], '5001')
+            print(f"ERROR： {e}")
+
+
+class DeleteHandler(BaseHandler):
+    def post(self):
+        try:
+            # 获取⼊参
+            ids = self.get_argument('answerIds')
+
+            if type(ids) == str:
+                ids = eval(ids)
+            code = delete_answers(ids)
+            if code == '0':
+                http_response(self, ERROR_CODE['0'], '0')
+            else:
+                code, error_ids = code
+                data = {
+                    "errorIds": error_ids
+                }
+                http_response(self, data, code)
+        except Exception as e:
+            # 获取⼊参失败时，抛出错误码及错误信息
+            http_response(self, ERROR_CODE['1001'], '1001')
             print(f"ERROR： {e}")

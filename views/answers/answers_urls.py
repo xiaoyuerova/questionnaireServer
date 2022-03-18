@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
 from views.answers.answers_views import (
-    SubmitHandler
+    SubmitHandler,
+    DeleteHandler
 )
 
 urls = [
-    (r'submit', SubmitHandler)
+    (r'submit', SubmitHandler),
+    (r'delete', DeleteHandler)
 ]

@@ -3,9 +3,7 @@ from common.db.questionnaires import Questionnaires, query_questionnaires
 from common.db.questions import query_questions
 from common.db.answers import query_answers
 from common.commons import list_to_dict, option_parsing
-import json
-import datetime
-from datetime import timedelta
+from common.db.delete import delete_questionnaires
 
 from conf.base import (
     ERROR_CODE
@@ -25,6 +23,7 @@ class CreateHandler(BaseHandler):
             questioner_id = self.get_argument('questionerId')
             name = self.get_argument('name')
 
+            print(name)
             questionnaire = Questionnaires(questionerId=questioner_id, name=name)
             code = questionnaire.add()
             if code == '0':
@@ -53,7 +52,7 @@ def get_questions(questionnaire_id):
     questions_obj = query_questions(questionnaire_id, search_all=True)
     questions = []
     for item in questions_obj:
-        item.options = option_parsing(item.options)
+        item.options = eval(item.options)
         dict_ = item.__dict__
         del dict_['_sa_instance_state']
         questions.append(dict_)
@@ -109,3 +108,30 @@ class GetHandler(BaseHandler):
             # 获取⼊参失败时，抛出错误码及错误信息
             http_response(self, ERROR_CODE['2001'], '2001')
             print(f"ERROR:{e}")
+
+
+class DeleteHandler(BaseHandler):
+    """
+    删除问卷
+    """
+
+    def post(self):
+        try:
+            # 获取⼊参
+            ids = self.get_argument('questionnaireIds')
+
+            if type(ids) == str:
+                ids = eval(ids)
+            code = delete_questionnaires(ids)
+            if code == '0':
+                http_response(self, ERROR_CODE['0'], '0')
+            else:
+                code, error_ids = code
+                data = {
+                    "errorIds": error_ids
+                }
+                http_response(self, data, code)
+        except Exception as e:
+            # 获取⼊参失败时，抛出错误码及错误信息
+            http_response(self, ERROR_CODE['1001'], '1001')
+            print(f"ERROR： {e}")

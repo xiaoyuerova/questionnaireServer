@@ -2,8 +2,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('mysql+pymysql://root:wxt123@localhost:3306/questionnaire_sys?charset=utf8', encoding="utf8",
-                       echo=False)
+# engine = create_engine('mysql+pymysql://root:wxt123@192.168.133.128:3306/questionnaire_sys?charset=utf8', encoding="utf8",
+#                        echo=False)
+engine = create_engine('mysql+pymysql://root:wxt123@1.116.207.102:3306/questionnaire_sys?charset=utf8',
+                       encoding="utf8", echo=False)
 BaseDB = declarative_base()
 Session = sessionmaker(bind=engine,
                        autocommit=False,
@@ -81,7 +83,10 @@ ERROR_CODE = {
     # respondents模块
     "4001": "入参失败",
     "4002": "提交的问卷id不存在",
+    "4010": "入参失败，value值为空",
     "4020": "要删除的答题人信息不存在",
+    "4021": "请传入要删除的答题人id",
+    "4022": "部分答题人信息删除失败",
 
     # answers模块
     '5001': '入参失败',
@@ -91,4 +96,6 @@ ERROR_CODE = {
     "5005": "该问卷id不存在",
     "5006": "入参失败，value值为空",
     "5020": "要删除的答案不存在",
+    "5021": "请传入要删除的答案d",
+    "5022": "部分答案信息删除失败",
 }

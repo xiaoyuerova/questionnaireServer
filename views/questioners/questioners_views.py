@@ -1,6 +1,6 @@
 from common.BaseHandler import BaseHandler
-from common.db.questioners import Questioners
-from common.db.query import query_questioners
+from common.db.questioners import Questioners, query_questioners
+from common.db.delete import delete_questioners
 
 from conf.base import (
     ERROR_CODE
@@ -89,14 +89,19 @@ class DeleteHandler(BaseHandler):
     def post(self):
         try:
             # 获取⼊参
-            id_ = self.get_argument('questionerId')
+            ids = self.get_argument('questionerIds')
 
-            ex_q = query_questioners(id_, key='id')
-            if ex_q:
-                code = ex_q.delete()
-                http_response(self, ERROR_CODE[code], code)
+            if type(ids) == str:
+                ids = eval(ids)
+            code = delete_questioners(ids)
+            if code == '0':
+                http_response(self, ERROR_CODE['0'], '0')
             else:
-                http_response(self, ERROR_CODE['1020'], '1020')
+                code, error_ids = code
+                data = {
+                    "errorIds": error_ids
+                }
+                http_response(self, data, code)
         except Exception as e:
             # 获取⼊参失败时，抛出错误码及错误信息
             http_response(self, ERROR_CODE['1001'], '1001')
