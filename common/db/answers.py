@@ -9,44 +9,6 @@ from sqlalchemy.orm import scoped_session
 from common.db.questions import query_questions
 
 
-def query_answers(value, key='questionnaireId', search_all=False):
-    """
-    :param value: 要搜索的值
-    :param key: 要搜索的属性
-    :param search_all: True表示搜索全部匹配值，False表示只获取第一个匹配值
-    :return:
-    """
-    session = scoped_session(Session)
-    try:
-        if search_all:
-            if key == 'questionnaireId':
-                ex_as = session.query(Answers).filter(Answers.questionnaireId == value).all()
-                return ex_as
-            if key == 'id':
-                ex_as = session.query(Answers).filter(Answers.id == value).all()
-                return ex_as
-            if key == 'respondentId':
-                ex_as = session.query(Answers).filter(Answers.respondentId == value).all()
-                return ex_as
-            return
-        if key == 'questionnaireId':
-            ex_a = session.query(Answers).filter(Answers.questionnaireId == value).first()
-            return ex_a
-        if key == 'id':
-            ex_a = session.query(Answers).filter(Answers.id == value).first()
-            return ex_a
-        if key == 'respondentId':
-            ex_a = session.query(Answers).filter(Answers.respondentId == value).first()
-            return ex_a
-        print(ERROR_CODE['1'])
-        return
-    except Exception as e:
-        session.rollback()
-        print(f"ERROR： {e}")
-    finally:
-        session.close()
-
-
 class Answers(AnswersBase):
     def __init__(self, **kwargs):
         respondent_id = kwargs['respondentId']
@@ -61,11 +23,9 @@ class Answers(AnswersBase):
             questionnaire_id = int(questionnaire_id)
         if type(question_id) == str:
             question_id = int(question_id)
-        # if type(reference) == str and reference == 'true':
-        #     reference = True
-        # if type(reference) == str and reference == 'false':
-        #     reference = False
-        if not type(answer) == str:
+        if type(reference_answer) == list:
+            reference_answer = str(reference_answer)
+        if type(answer) == list:
             answer = str(answer)
         super(Answers, self).__init__(respondent_id, questionnaire_id, question_id, reference, reference_answer, answer)
 
@@ -103,6 +63,8 @@ class Answers(AnswersBase):
         session = scoped_session(Session)
         try:
             if key == 'answer':
+                if type(value) == list:
+                    value = str(value)
                 session.query(Answers).filter(Answers.id == self.id).update({Answers.answer: value})
             session.commit()
             print('modify successful')
@@ -135,3 +97,48 @@ class Answers(AnswersBase):
     #         print(f"ERROR： {e}")
     #     finally:
     #         session.close()
+
+
+def query_answers(value, key='questionnaireId', search_all=False):
+    """
+    :param value: 要搜索的值
+    :param key: 要搜索的属性
+    :param search_all: True表示搜索全部匹配值，False表示只获取第一个匹配值
+    :return:
+    """
+    session = scoped_session(Session)
+    try:
+        if search_all:
+            if key == 'questionnaireId':
+                ex_as = session.query(Answers).filter(Answers.questionnaireId == value).all()
+                return check_out(ex_as)
+            if key == 'id':
+                ex_as = session.query(Answers).filter(Answers.id == value).all()
+                return check_out(ex_as)
+            if key == 'respondentId':
+                ex_as = session.query(Answers).filter(Answers.respondentId == value).all()
+                return check_out(ex_as)
+            return
+        if key == 'questionnaireId':
+            ex_a = session.query(Answers).filter(Answers.questionnaireId == value).first()
+            return check_out([ex_a])[0]
+        if key == 'id':
+            ex_a = session.query(Answers).filter(Answers.id == value).first()
+            return check_out([ex_a])[0]
+        if key == 'respondentId':
+            ex_a = session.query(Answers).filter(Answers.respondentId == value).first()
+            return check_out([ex_a])[0]
+        print(ERROR_CODE['1'])
+        return
+    except Exception as e:
+        session.rollback()
+        print(f"ERROR： {e}")
+    finally:
+        session.close()
+
+
+def check_out(answers: list[Answers]):
+    for answer in answers:
+        answer.referenceAnswer = eval(answer.referenceAnswer)
+        answer.answer = eval(answer.answer)
+    return answers

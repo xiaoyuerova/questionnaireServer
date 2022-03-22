@@ -52,7 +52,7 @@ def get_questions(questionnaire_id):
     questions_obj = query_questions(questionnaire_id, search_all=True)
     questions = []
     for item in questions_obj:
-        item.options = eval(item.options)
+        # item.options = eval(item.options)
         dict_ = item.__dict__
         del dict_['_sa_instance_state']
         questions.append(dict_)
@@ -64,8 +64,8 @@ def get_answers(respondent_id):
     answers = []
     if answers_obj:
         for item in answers_obj:
-            item.referenceAnswer = eval(item.referenceAnswer)
-            item.answer = eval(item.answer)
+            # item.referenceAnswer = eval(item.referenceAnswer)
+            # item.answer = eval(item.answer)
             dict_ = item.__dict__
             del dict_['_sa_instance_state']
             answers.append(dict_)

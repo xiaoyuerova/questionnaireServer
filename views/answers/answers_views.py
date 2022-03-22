@@ -10,7 +10,6 @@ from common.commons import http_response
 from common.db.respondents import query_respondents
 from common.db.questionnaires import query_questionnaires
 from common.db.answers import query_answers
-from common.db.questions import query_questions
 from common.db.delete import delete_answers
 
 
@@ -38,12 +37,11 @@ class SubmitHandler(BaseHandler):
             if not questionnaire:
                 http_response(self, ERROR_CODE['5005'], '5005')
                 return
-            print(answers, type(answers))
             answers = json.loads(answers)
-            print(answers, type(answers))
             if answers:
                 ex_as = query_answers(respondent_id, key='respondentId', search_all=True)
                 for answer in answers:
+                    # 检查提交答案题目，数据库中是否已经存在答案，存在就修改，不存在添加
                     flag = True
                     index = 0
                     if ex_as:
@@ -61,32 +59,29 @@ class SubmitHandler(BaseHandler):
                                              referenceAnswer=answer['referenceAnswer'],
                                              answer=answer['answer'])
                         answer_obj.add()
-                        question = query_questions(answer_obj.questionId, key='id')
-                        temp_reference_answer = eval(question.referenceAnswer)
-                        new_answer = eval(answer_obj.answer)
-                        for i in range(0, len(new_answer)):
-                            if new_answer[i]:
-                                temp_reference_answer[i] += 1
-                        question.modify(str(temp_reference_answer), key='referenceAnswer')
+                        # question = query_questions(answer_obj.questionId, key='id')
+                        # temp_reference_answer = eval(question.referenceAnswer)
+                        # new_answer = eval(answer_obj.answer)
+                        # for i in range(0, len(new_answer)):
+                        #     if new_answer[i]:
+                        #         temp_reference_answer[i] += 1
+                        # question.modify(str(temp_reference_answer), key='referenceAnswer')
 
                     else:
                         # 数据库中已经存在回答，先修改对应问题的referenceAnswer（回答统计信息）,再修改answers
-                        old_answer = ex_as[index].answer
                         new_answer = answer['answer']
-                        if type(old_answer) == str:
-                            old_answer = eval(old_answer)
                         if type(new_answer) == str:
                             new_answer = eval(new_answer)
-                        question = query_questions(answer['questionId'], key='id')
-                        temp_reference_answer = eval(question.referenceAnswer)
-                        for i in range(0, len(old_answer)):
-                            if old_answer[i]:
-                                temp_reference_answer[i] -= 1
-                        for i in range(0, len(new_answer)):
-                            if new_answer[i]:
-                                temp_reference_answer[i] += 1
-                        question.modify(str(temp_reference_answer), key='referenceAnswer')
-                        ex_as[index].modify(str(answer['answer']))
+                        # question = query_questions(answer['questionId'], key='id')
+                        # temp_reference_answer = eval(question.referenceAnswer)
+                        # for i in range(0, len(old_answer)):
+                        #     if old_answer[i]:
+                        #         temp_reference_answer[i] -= 1
+                        # for i in range(0, len(new_answer)):
+                        #     if new_answer[i]:
+                        #         temp_reference_answer[i] += 1
+                        # question.modify(str(temp_reference_answer), key='referenceAnswer')
+                        ex_as[index].modify(str(new_answer))
             http_response(self, ERROR_CODE['0'], '0')
 
         except Exception as e:

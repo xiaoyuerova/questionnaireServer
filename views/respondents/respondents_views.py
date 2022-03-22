@@ -1,7 +1,10 @@
 from common.BaseHandler import BaseHandler
 from common.db.respondents import Respondents, query_respondents
 from common.db.questionnaires import query_questionnaires
+from common.db.questions import query_questions
+from common.db.answers import query_answers
 from common.db.delete import delete_respondents
+from views.respondents.utils import complete_handler
 
 from conf.base import (
     ERROR_CODE
@@ -67,16 +70,32 @@ class CompleteHandler(BaseHandler):
             if type(complete) == str:
                 complete = eval(complete)
             respondent = query_respondents(id_, key='id')
-            # 修改完成问卷的人数
+            # 验证
+            if not respondent:
+                http_response(self, ERROR_CODE['4003'], '4003')
+                return
             questionnaire = query_questionnaires(respondent.questionnaireId, key='id')
+            # 判断作答是否全部完成
+            questions = query_questions(questionnaire.id, key='questionnaireId', search_all=True)
+            answers = query_answers(respondent.id, key='respondentId', search_all=True)
+            if not questions:
+                # 问卷没有题目，肯定出问题了
+                http_response(self, ERROR_CODE['4004'], '4004')
+                return
+            if not answers:
+                http_response(self, ERROR_CODE['4004'], '4004')
+                return
+            if not len(questions) == len(answers):
+                http_response(self, ERROR_CODE['4004'], '4004')
+                return
+            # 修改完成问卷的人数
             if complete != respondent.complete:
                 if complete:
-                    questionnaire.modify(questionnaire.respondentsCount + 1, key='respondentsCount')
+                    complete_handler(answers)
                 else:
-                    questionnaire.modify(questionnaire.respondentsCount - 1, key='respondentsCount')
-            if respondent:
-                code = respondent.modify(complete, key='complete')
-                http_response(self, ERROR_CODE[code], code)
+                    complete_handler(answers, de_complete=True)
+            code = respondent.modify(complete, key='complete')
+            http_response(self, ERROR_CODE[code], code)
         except Exception as e:
             # 获取⼊参失败时，抛出错误码及错误信息
             http_response(self, ERROR_CODE['1001'], '1001')

@@ -15,38 +15,6 @@ from sqlalchemy.orm import scoped_session
 from common.db.questionnaires import query_questionnaires
 
 
-def query_questions(value, key='questionnaireId', search_all=False):
-    """
-    :param value: 要搜索的值
-    :param key: 要搜索的属性
-    :param search_all: True表示搜索全部匹配值，False表示只获取第一个匹配值
-    :return:
-    """
-    session = scoped_session(Session)
-    try:
-        if search_all:
-            if key == 'questionnaireId':
-                ex_qs = session.query(Questions).filter(Questions.questionnaireId == value).all()
-                return ex_qs
-            if key == 'id':
-                ex_qs = session.query(Questions).filter(Questions.id == value).all()
-                return ex_qs
-            return
-        if key == 'questionnaireId':
-            ex_q = session.query(Questions).filter(Questions.name == value).first()
-            return ex_q
-        if key == 'id':
-            ex_q = session.query(Questions).filter(Questions.id == value).first()
-            return ex_q
-        print(ERROR_CODE['1'])
-        return
-    except Exception as e:
-        session.rollback()
-        print(f"ERROR： {e}")
-    finally:
-        session.close()
-
-
 class Questions(QuestionsBase):
     def __init__(self, **kwargs):
         """
@@ -124,7 +92,13 @@ class Questions(QuestionsBase):
             return '3010'
         session = scoped_session(Session)
         try:
+            if key == 'options':
+                if type(value) == list:
+                    value = str(value)
+                session.query(Questions).filter(Questions.id == self.id).update({Questions.options: value})
             if key == 'referenceAnswer':
+                if type(value) == list:
+                    value = str(value)
                 session.query(Questions).filter(Questions.id == self.id).update({Questions.referenceAnswer: value})
             if key == 'reference':
                 session.query(Questions).filter(Questions.id == self.id).update({Questions.reference: value})
@@ -136,3 +110,42 @@ class Questions(QuestionsBase):
             print(f"ERROR： {e}")
         finally:
             session.close()
+
+
+def query_questions(value, key='questionnaireId', search_all=False):
+    """
+    :param value: 要搜索的值
+    :param key: 要搜索的属性
+    :param search_all: True表示搜索全部匹配值，False表示只获取第一个匹配值
+    :return:
+    """
+    session = scoped_session(Session)
+    try:
+        if search_all:
+            if key == 'questionnaireId':
+                ex_qs = session.query(Questions).filter(Questions.questionnaireId == value).all()
+                return check_out(ex_qs)
+            if key == 'id':
+                ex_qs = session.query(Questions).filter(Questions.id == value).all()
+                return check_out(ex_qs)
+            return
+        if key == 'questionnaireId':
+            ex_q = session.query(Questions).filter(Questions.questionnaireId == value).first()
+            return check_out([ex_q])[0]
+        if key == 'id':
+            ex_q = session.query(Questions).filter(Questions.id == value).first()
+            return check_out([ex_q])[0]
+        print(ERROR_CODE['1'])
+        return
+    except Exception as e:
+        session.rollback()
+        print(f"ERROR： {e}")
+    finally:
+        session.close()
+
+
+def check_out(questions: list[Questions]):
+    for question in questions:
+        question.options = eval(question.options)
+        question.referenceAnswer = eval(question.referenceAnswer)
+    return questions

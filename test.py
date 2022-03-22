@@ -32,10 +32,14 @@ def add(nums):
 
 
 def main():
-    a = [1, 2, 3]
-    x = add(a)
-    if not x == 1:
-        print(x)
+    a = True
+    b = False
+    c = True
+    d = False
+    if a == b:
+        print('a,ok')
+    if b == d:
+        print('b,ok')
 
 
 if __name__ == "__main__":
