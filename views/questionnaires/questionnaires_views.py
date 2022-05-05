@@ -1,9 +1,11 @@
 from common.BaseHandler import BaseHandler
 from common.db.questionnaires import Questionnaires, query_questionnaires
 from common.db.questions import query_questions
+from common.db.respondents import Respondents,query_respondents
 from common.db.answers import query_answers
 from common.commons import list_to_dict, option_parsing
 from common.db.delete import delete_questionnaires
+from common.decorated import respondent_auth
 
 from conf.base import (
     ERROR_CODE
@@ -64,8 +66,6 @@ def get_answers(respondent_id):
     answers = []
     if answers_obj:
         for item in answers_obj:
-            # item.referenceAnswer = eval(item.referenceAnswer)
-            # item.answer = eval(item.answer)
             dict_ = item.__dict__
             del dict_['_sa_instance_state']
             answers.append(dict_)
@@ -75,8 +75,6 @@ def get_answers(respondent_id):
 class GetHandler(BaseHandler):
     """
     获取问卷信息
-    param respondentId: 答题人id
-    param questionnaire_id: 问卷id
     return
         data = {
             'question': ,
@@ -84,11 +82,12 @@ class GetHandler(BaseHandler):
         }
     """
 
+    @respondent_auth
     def get(self):
         try:
             # 获取参数
-            respondent_id = self.get_argument('respondentId')
-            questionnaire_id = self.get_argument('questionnaireId')
+            respondent_id = self.user.id
+            questionnaire_id = self.user.questionnaireId
 
             questionnaire = query_questionnaires(questionnaire_id, key='id')
             if questionnaire:
@@ -96,7 +95,7 @@ class GetHandler(BaseHandler):
                 questions = get_questions(questionnaire.id)
                 answers = get_answers(respondent_id)
                 data = {
-                    'questionnaire': questionnaire.__dict__,
+                    'questionnaire': questionnaire_dict,
                     'questions': questions,
                     'answers': answers
                 }

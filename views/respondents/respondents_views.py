@@ -5,6 +5,8 @@ from common.db.questions import query_questions
 from common.db.answers import query_answers
 from common.db.delete import delete_respondents
 from views.respondents.utils import complete_handler
+from common.commons import token_encode
+from common.decorated import respondent_login,respondent_auth
 
 from conf.base import (
     ERROR_CODE
@@ -14,6 +16,7 @@ from common.commons import http_response
 
 
 class RegisterHandler(BaseHandler):
+    @respondent_login
     def post(self):
         try:
             # 获取⼊参
@@ -22,10 +25,13 @@ class RegisterHandler(BaseHandler):
             respondent = Respondents(questionnaireId=questionnaire_id)
             code = respondent.add()
             if code == '0':
-                data = {
-                    'respondentId': respondent.id
+                token = token_encode(respondent.id, 7)
+                print(token)
+                res = {
+                    'respondentId': respondent.id,
+                    'token': token
                 }
-                http_response(self, data, '0')
+                http_response(self, res, '0')
             else:
                 http_response(self, ERROR_CODE[code], code)
 
@@ -59,6 +65,7 @@ class DeleteHandler(BaseHandler):
 
 
 class CompleteHandler(BaseHandler):
+    @respondent_auth
     def post(self):
         try:
             # 获取⼊参
@@ -70,10 +77,6 @@ class CompleteHandler(BaseHandler):
             if type(complete) == str:
                 complete = eval(complete)
             respondent = query_respondents(id_, key='id')
-            # 验证
-            if not respondent:
-                http_response(self, ERROR_CODE['4003'], '4003')
-                return
             questionnaire = query_questionnaires(respondent.questionnaireId, key='id')
             # 判断作答是否全部完成
             questions = query_questions(questionnaire.id, key='questionnaireId', search_all=True)

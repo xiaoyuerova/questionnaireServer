@@ -1,6 +1,7 @@
 from common.BaseHandler import BaseHandler
 import json
 from common.db.answers import Answers
+from common.decorated import respondent_auth
 
 from conf.base import (
     ERROR_CODE
@@ -14,6 +15,7 @@ from common.db.delete import delete_answers
 
 
 class SubmitHandler(BaseHandler):
+    @respondent_auth
     def post(self):
         """
         提交答案

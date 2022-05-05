@@ -1,6 +1,7 @@
 import json
 import os
 import datetime
+import jwt
 from datetime import timedelta
 from conf.base import SPE_CH
 
@@ -96,6 +97,24 @@ def option_parsing(options_union):
         else:
             option = option + ch
     return options
+
+
+def token_encode(id_: int, days: int):
+    dic = {
+        'exp': int((datetime.datetime.now() + datetime.timedelta(days=days)).timestamp()),  # 过期时间
+        'iat': datetime.datetime.now(),  # 开始时间
+        'iss': 'wangxt',  # 签名
+        'data': {  # 内容，一般存放该用户id和开始时间
+            'id': id_,
+            'time': int((datetime.datetime.now()).timestamp())
+        },
+    }
+    token = jwt.encode(dic, 'secret', algorithm='HS256')  # 加密生成字符串
+    return token
+
+
+def token_decode(session_id):
+    return jwt.decode(session_id, 'secret', issuer='wangxt', algorithms=['HS256'])
 
 
 if __name__ == "__main__":
