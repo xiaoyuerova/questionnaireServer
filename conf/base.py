@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 # engine = create_engine('mysql+pymysql://root:wxt123@192.168.133.128:3306/questionnaire_sys?charset=utf8', encoding="utf8",
 #                        echo=False)
-engine = create_engine('mysql+pymysql://root:wxt123@1.116.207.102:3306/questionnaire_sys?charset=utf8',
+engine = create_engine('mysql+pymysql://root:wxt123@121.40.58.21:3306/questionnaire_sys?charset=utf8',
                        encoding="utf8", echo=False)
 BaseDB = declarative_base()
 Session = sessionmaker(bind=engine,
