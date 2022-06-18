@@ -24,6 +24,7 @@ class Application(tornado.web.Application):
             (r"/questions/", include('views.questions.questions_urls')),
             (r"/respondents/", include('views.respondents.respondents_urls')),
             (r"/answers/", include('views.answers.answers_urls')),
+            (r"/summer/", include('views.summer.summer_urls')),
         ])
         settings = dict(
             debug=True,

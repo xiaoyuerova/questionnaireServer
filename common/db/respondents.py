@@ -1,11 +1,6 @@
 from common.models import RespondentsBase
 from conf.base import (
-    ERROR_CODE,
-    QUESTION_TYPE,
-    QUESTION_LEN_MAX,
-    QUESTION_LEN_MIN,
-    OPTIONS_LEN_MAX,
-    OPTIONS_LEN_MIN
+    ERROR_CODE
 )
 
 from common.db.questionnaires import query_questionnaires

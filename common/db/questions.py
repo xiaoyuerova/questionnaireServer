@@ -23,9 +23,12 @@ class Questions(QuestionsBase):
         questionnaire_id = kwargs['questionnaireId']
         question_number = kwargs['questionNumber']
         _type = kwargs['type']
+        model = kwargs.get('model')
         question = kwargs['question']
         options = kwargs['options']
         options_count = kwargs['optionsCount']
+        # 非必须键
+        reference_text = kwargs.get('referenceText')
         if type(questionnaire_id) == str:
             questionnaire_id = int(questionnaire_id)
         if type(question_number) == str:
@@ -36,7 +39,9 @@ class Questions(QuestionsBase):
             options = str(options)
         if type(options_count) == str:
             options_count = int(options_count)
-        super(Questions, self).__init__(questionnaire_id, question_number, _type, question, options, options_count)
+
+        super(Questions, self).__init__(questionnaire_id, question_number, _type, model, question, options,
+                                        options_count, reference_text)
 
     def verify(self):
         """

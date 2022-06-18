@@ -13,15 +13,11 @@ class CreateHandler(BaseHandler):
     def post(self):
         try:
             # 获取⼊参
-            questionnaire_id = self.get_argument('questionnaireId')
-            question_number = self.get_argument('questionNumber')
-            _type = self.get_argument('type')
-            question = self.get_argument('question')
-            options = self.get_argument('options')
-            options_count = self.get_argument('options_count')
+            data = {}
+            for key in self.request.arguments:
+                data[key] = self.get_argument(key)
 
-            question = Questions(questionnaireId=questionnaire_id, questionNumber=question_number, type=_type,
-                                 question=question, options=options, optionsCount=options_count)
+            question = Questions(**data)
             code = question.add()
             http_response(self, ERROR_CODE[code], code)
 

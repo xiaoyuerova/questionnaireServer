@@ -54,13 +54,13 @@ class Questionnaires(QuestionnairesBase):
         """
         questionerId: str 或 int
         name: str
+        model: int
         :param kwargs:
         """
-        questioner_id = kwargs['questionerId']
-        name = kwargs['name']
-        if type(questioner_id) == str:
-            questioner_id = int(questioner_id)
-        super(Questionnaires, self).__init__(questioner_id, name)
+        questioner_id = kwargs.get('questionerId')
+        name = kwargs.get('name')
+        model = kwargs.get('model')
+        super(Questionnaires, self).__init__(questioner_id, name, model)
 
     def verify(self):
         if len(self.name) < QUESTIONNAIRE_NAME_LEN_MIN:

@@ -1,12 +1,15 @@
 from common.BaseHandler import BaseHandler
-from common.db.respondents import Respondents, query_respondents
-from common.db.questionnaires import query_questionnaires
-from common.db.questions import query_questions
-from common.db.answers import query_answers
-from common.db.delete import delete_respondents
+from common.db import (
+    Respondents,
+    query_respondents,
+    query_questionnaires,
+    query_questions,
+    query_answers,
+    delete_respondents
+)
 from views.respondents.utils import complete_handler
 from common.commons import token_encode
-from common.decorated import respondent_login,respondent_auth
+from common.decorated import respondent_login, respondent_auth
 
 from conf.base import (
     ERROR_CODE

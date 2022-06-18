@@ -11,12 +11,14 @@ from common.db.questions import query_questions
 
 class Answers(AnswersBase):
     def __init__(self, **kwargs):
-        respondent_id = kwargs['respondentId']
-        questionnaire_id = kwargs['questionnaireId']
-        question_id = kwargs['questionId']
-        reference = kwargs['reference']
-        reference_answer = kwargs['referenceAnswer']
-        answer = kwargs['answer']
+        respondent_id = kwargs.get('respondentId')
+        questionnaire_id = kwargs.get('questionnaireId')
+        question_id = kwargs.get('questionId')
+        reference = kwargs.get('reference')
+        reference_answer = kwargs.get('referenceAnswer')
+        answer = kwargs.get('answer')
+        reference_text_answer = kwargs.get('referenceTextAnswer')
+        text_answer = kwargs.get('textAnswer')
         if type(respondent_id) == str:
             respondent_id = int(respondent_id)
         if type(questionnaire_id) == str:
@@ -27,7 +29,9 @@ class Answers(AnswersBase):
             reference_answer = str(reference_answer)
         if type(answer) == list:
             answer = str(answer)
-        super(Answers, self).__init__(respondent_id, questionnaire_id, question_id, reference, reference_answer, answer)
+
+        super(Answers, self).__init__(respondent_id, questionnaire_id, question_id, reference, reference_answer, answer,
+                                      reference_text_answer, text_answer)
 
     def verify(self):
         question = query_questions(self.questionId, key='id')

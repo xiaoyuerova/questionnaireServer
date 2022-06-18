@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 # engine = create_engine('mysql+pymysql://root:wxt123@192.168.133.128:3306/questionnaire_sys?charset=utf8', encoding="utf8",
 #                        echo=False)
-engine = create_engine('mysql+pymysql://root:wxt123@121.40.58.21:3306/questionnaire_sys?charset=utf8',
+engine = create_engine('mysql+pymysql://root:wxt123@121.40.58.21:3306/questionnaire_test?charset=utf8',
                        encoding="utf8", echo=False)
 BaseDB = declarative_base()
 Session = sessionmaker(bind=engine,
@@ -104,4 +104,12 @@ ERROR_CODE = {
     "5020": "要删除的答案不存在",
     "5021": "请传入要删除的答案d",
     "5022": "部分答案信息删除失败",
+
+    # respondentsSummer模块
+    "6001": "入参失败",
+    "6002": "用户名长度小于{}个字符".format(USER_NAME_LEN_MIN),
+    "6003": "用户名长度大于{}个字符".format(USER_NAME_LEN_MAX),
+    "6004": "密码长度小于{}".format(PWD_LEN_MIN),
+    "6005": "密码长度大于{}".format(PWD_LEN_MAX),
+    "6006": "用户名或密码错误"
 }
